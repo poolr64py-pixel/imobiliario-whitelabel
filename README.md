@@ -1,2 +1,2 @@
-# imobiliario-whitelabel.
+# imobiliario-whitelabel
 projeto-site-app
