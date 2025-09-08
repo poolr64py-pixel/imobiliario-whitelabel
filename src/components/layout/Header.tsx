@@ -3,24 +3,22 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import { useTenant, useThemeConfig } from '@/components/providers/TenantProvider';
-import { 
-  Bars3Icon, 
-  XMarkIcon, 
+import {
+  Bars3Icon,
+  XMarkIcon,
   BuildingOfficeIcon,
-  GlobeAltIcon 
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { tenant, locale, messages } = useTenant();
+  const { tenant } = useTenant();
   const { primaryColor } = useThemeConfig();
   const router = useRouter();
-
-  // Função para traduzir textos
-  const t = (key: string) => {
-    return messages?.common?.[key] || key;
-  };
+  const locale = useLocale();
+  const t = useTranslations('common');
 
   console.log(`HEADER: locale=${locale}, home=${t('home')}`);
 
@@ -37,7 +35,7 @@ export function Header() {
     const currentIndex = locales.indexOf(locale);
     const nextIndex = (currentIndex + 1) % locales.length;
     const nextLocale = locales[nextIndex];
-    
+
     router.push(`/${nextLocale}`);
   };
 
@@ -48,7 +46,7 @@ export function Header() {
       case 'es-PY': return '🇵🇾';
       case 'en-US': return '🇺🇸';
       case 'gn-PY': return '🇵🇾';
-      default: return '🌐';
+      default: return '🌍';
     }
   };
 
@@ -68,8 +66,8 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo e Nome */}
           <Link href={`/${locale}`} className="flex items-center space-x-2 group">
-            <div 
-              className="h-8 w-8 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105" 
+            <div
+              className="h-8 w-8 rounded-lg flex items-center justify-center transition-transform group-hover:scale-105"
               style={{ backgroundColor: primaryColor }}
             >
               <BuildingOfficeIcon className="h-4 w-4 text-white" />
@@ -84,15 +82,15 @@ export function Header() {
           {/* Navegação Desktop */}
           <nav className="hidden md:flex items-center space-x-1">
             {navigation.map((item) => (
-              <Link 
+              <Link
                 key={item.name}
-                href={item.href} 
+                href={item.href}
                 className="text-sm text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md font-medium transition-colors hover:bg-gray-50"
               >
                 {item.name}
               </Link>
             ))}
-            
+
             {/* Seletor de Idioma */}
             <button
               onClick={toggleLocale}
@@ -115,8 +113,8 @@ export function Header() {
               <span className="text-sm">{getLocaleFlag()}</span>
               <span className="text-xs">{getLocaleLabel()}</span>
             </button>
-            
-            <button 
+
+            <button
               className="p-2 rounded-md transition-colors hover:bg-gray-50"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-expanded={isMenuOpen}
@@ -145,7 +143,7 @@ export function Header() {
                   {item.name}
                 </Link>
               ))}
-              
+
               {/* Info do idioma atual no mobile */}
               <div className="px-3 py-2 text-xs text-gray-400 border-t border-gray-100 mt-2 pt-2">
                 Idioma atual: {getLocaleFlag()} {getLocaleLabel()}

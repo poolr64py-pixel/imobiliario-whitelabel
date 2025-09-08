@@ -1,11 +1,8 @@
-import { Inter } from 'next/font/google';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
-
 export const metadata = {
-  title: 'Plataforma Imobiliaria',
-  description: 'Sistema imobiliario white-label',
+  title: 'Plataforma Imobiliária',
+  description: 'Sistema de gestão imobiliária',
 };
 
 export default function RootLayout({
@@ -13,5 +10,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <html>
+      <body>
+        {children}
+      </body>
+    </html>
+  );
 }
