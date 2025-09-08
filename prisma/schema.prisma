@@ -1,0 +1,261 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id               String   @id @default(cuid())
+  nome             String
+  dominio          String   @unique
+  subdominio       String?  @unique
+  slug             String   @unique
+  ativo            Boolean  @default(true)
+  idiomaPadrao     String   @default("pt-BR")
+  moedaPadrao      String   @default("BRL")
+  plano            String   @default("BASICO")
+  configuracoes    String?  // JSON as text in SQLite
+  logoUrl          String?
+  faviconUrl       String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relacionamentos
+  temaConfig       TemaConfig?
+  imoveis          Imovel[]
+  corretores       Corretor[]
+  leads            Lead[]
+  usuarios         Usuario[]
+
+  @@map("tenants")
+}
+
+model TemaConfig {
+  id               String  @id @default(cuid())
+  corPrimaria      String  @default("#3B82F6")
+  corSecundaria    String  @default("#64748B")
+  corDestaque      String  @default("#EF4444")
+  fontePrimaria    String  @default("Inter")
+  logoClaro        String?
+  logoEscuro       String?
+  cssCustomizado   String?
+  layoutInicial    String  @default("grid")
+  mostrarPrecos    Boolean @default(true)
+  exibirWatermark  Boolean @default(true)
+  
+  tenantId         String  @unique
+  tenant           Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@map("tema_configs")
+}
+
+model Usuario {
+  id         String   @id @default(cuid())
+  nome       String
+  email      String   @unique
+  telefone   String?
+  foto       String?
+  role       String   @default("USER")
+  ativo      Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenantId   String
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  corretor   Corretor?
+
+  @@map("usuarios")
+}
+
+model Corretor {
+  id             String  @id @default(cuid())
+  creci          String?
+  especializacao String?
+  biografia      String?
+  whatsapp       String?
+  instagram      String?
+  linkedin       String?
+  ativo          Boolean @default(true)
+  
+  usuarioId      String  @unique
+  usuario        Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  
+  tenantId       String
+  tenant         Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  imoveis        Imovel[]
+  leads          Lead[]
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("corretores")
+}
+
+model Imovel {
+  id                String     @id @default(cuid())
+  titulo            String
+  descricao         String
+  preco             Float
+  moeda             String     @default("BRL")
+  tipo              String
+  categoria         String
+  codigoReferencia  String?    @unique
+  slug              String?    @unique
+  
+  // Status e flags
+  status            String     @default("DISPONIVEL")
+  destaque          Boolean    @default(false)
+  urgente           Boolean    @default(false)
+  visualizacoes     Int        @default(0)
+  
+  // Datas
+  dataPublicacao    DateTime   @default(now())
+  dataVencimento    DateTime?
+  
+  // Relacionamentos
+  tenantId          String
+  tenant            Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  corretorId        String
+  corretor          Corretor   @relation(fields: [corretorId], references: [id])
+  
+  endereco          Endereco?
+  caracteristicas   Caracteristicas?
+  imagens           Imagem[]
+  videos            Video[]
+  seo               Seo?
+  leads             Lead[]
+
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  @@map("imoveis")
+}
+
+model Endereco {
+  id           String  @id @default(cuid())
+  rua          String
+  numero       String?
+  complemento  String?
+  bairro       String
+  cidade       String
+  estado       String
+  pais         String  @default("Brasil")
+  cep          String?
+  coordenadas  String? // JSON as text
+  regiao       String?
+  proximidades String? // JSON as text
+  
+  imovelId     String  @unique
+  imovel       Imovel  @relation(fields: [imovelId], references: [id], onDelete: Cascade)
+
+  @@map("enderecos")
+}
+
+model Caracteristicas {
+  id               String  @id @default(cuid())
+  quartos          Int     @default(0)
+  suites           Int     @default(0)
+  banheiros        Int     @default(1)
+  areaTotal        Float
+  areaPrivativa    Float?
+  areaConstruida   Float?
+  vagas            Int     @default(0)
+  vagasCoberta     Int     @default(0)
+  amenidades       String? // JSON as text
+  anoConstricao    Int?
+  conservacao      String?
+  mobiliado        String?
+  iptu             Float?
+  condominio       Float?
+  aceitaAnimais    Boolean @default(false)
+  piscinaPrivada   Boolean @default(false)
+  jardimPrivado    Boolean @default(false)
+  
+  imovelId         String  @unique
+  imovel           Imovel  @relation(fields: [imovelId], references: [id], onDelete: Cascade)
+
+  @@map("caracteristicas")
+}
+
+model Imagem {
+  id              String @id @default(cuid())
+  url             String
+  alt             String?
+  ordem           Int    @default(0)
+  principal       Boolean @default(false)
+  
+  imovelId        String
+  imovel          Imovel @relation(fields: [imovelId], references: [id], onDelete: Cascade)
+
+  @@map("imagens")
+}
+
+model Video {
+  id        String @id @default(cuid())
+  url       String
+  tipo      String @default("youtube")
+  titulo    String?
+  
+  imovelId  String
+  imovel    Imovel @relation(fields: [imovelId], references: [id], onDelete: Cascade)
+
+  @@map("videos")
+}
+
+model Seo {
+  id              String  @id @default(cuid())
+  metaTitle       String?
+  metaDescription String?
+  keywords        String?
+  canonicalURL    String?
+  noIndex         Boolean @default(false)
+  
+  imovelId        String  @unique
+  imovel          Imovel  @relation(fields: [imovelId], references: [id], onDelete: Cascade)
+
+  @@map("seos")
+}
+
+model Lead {
+  id          String   @id @default(cuid())
+  nome        String
+  email       String
+  telefone    String
+  whatsapp    String?
+  mensagem    String?
+  interesse   String
+  origem      String   @default("SITE")
+  status      String   @default("NOVO")
+  valor       Float?
+  
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  
+  imovelId    String?
+  imovel      Imovel?  @relation(fields: [imovelId], references: [id])
+  
+  corretorId  String?
+  corretor    Corretor? @relation(fields: [corretorId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("leads")
+}
+
+model Cliente {
+  id        String   @id @default(cuid())
+  nome      String
+  email     String   @unique
+  telefone  String?
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("clientes")
+}

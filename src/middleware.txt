@@ -1,0 +1,96 @@
+import { NextRequest, NextResponse } from 'next/server';
+import createIntlMiddleware from 'next-intl/middleware';
+import { locales } from './i18n';
+
+// Lista de subdomínios que são parte da plataforma (não tenants)
+const SYSTEM_SUBDOMAINS = ['www', 'admin', 'api', 'docs', 'blog', 'support'];
+
+// Middleware de internacionalização
+const intlMiddleware = createIntlMiddleware({
+  locales,
+  defaultLocale: 'pt-BR',
+  localePrefix: 'as-needed',
+});
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const hostname = request.headers.get('host') || '';
+  
+  // Extrair domínio e subdomínio
+  const url = new URL(request.url);
+  const host = url.hostname;
+  const subdomain = host.split('.')[0];
+  
+  // Determinar se é um tenant baseado no hostname
+  let tenantId: string | null = null;
+  let isSubdomainTenant = false;
+  
+  // Verificar se é um subdomínio de tenant (não sistema)
+  if (subdomain && !SYSTEM_SUBDOMAINS.includes(subdomain) && host.includes('.')) {
+    isSubdomainTenant = true;
+    tenantId = subdomain;
+  }
+  
+  // Verificar se é um domínio customizado de tenant
+  if (!isSubdomainTenant && !host.includes('localhost') && !host.includes('vercel.app')) {
+    // Aqui você pode fazer uma consulta ao banco para verificar se é um domínio customizado
+    // Por enquanto, vamos usar uma lógica simples
+    tenantId = await getTenantIdByDomain(host);
+  }
+  
+  // Headers para o tenant
+  const requestHeaders = new Headers(request.headers);
+  if (tenantId) {
+    requestHeaders.set('x-tenant-id', tenantId);
+    requestHeaders.set('x-tenant-type', isSubdomainTenant ? 'subdomain' : 'domain');
+  }
+  
+  // Aplicar middleware de internacionalização
+  const intlResponse = intlMiddleware(request);
+  
+  // Se o middleware de internacionalização retornou uma resposta (redirect), usar ela
+  if (intlResponse) {
+    // Adicionar headers do tenant à resposta
+    if (tenantId) {
+      intlResponse.headers.set('x-tenant-id', tenantId);
+      intlResponse.headers.set('x-tenant-type', isSubdomainTenant ? 'subdomain' : 'domain');
+    }
+    return intlResponse;
+  }
+  
+  // Continuar com a request normal, mas com headers do tenant
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+}
+
+// Função para buscar tenant por domínio (simulada - você pode implementar cache aqui)
+async function getTenantIdByDomain(domain: string): Promise<string | null> {
+  // Em produção, você pode usar um cache Redis ou consulta otimizada
+  try {
+    // Importação dinâmica para evitar problemas de edge runtime
+    const { getTenantByDomain } = await import('./lib/database');
+    const tenant = await getTenantByDomain(domain);
+    return tenant?.slug || null;
+  } catch (error) {
+    console.error('Erro ao buscar tenant por domínio:', error);
+    return null;
+  }
+}
+
+export const config = {
+  // Aplicar middleware apenas nas rotas necessárias
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - robots.txt, sitemap.xml (SEO files)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)',
+  ],
+};

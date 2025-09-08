@@ -1,0 +1,14 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "search": "Search",
+    "contact": "Contact",
+    "about": "About",
+    "home": "Home",
+    "properties": "Properties"
+  },
+  "hero": {
+    "title": "Find your dream property",
+    "subtitle": "The best property selection in the region"
+  }
+}

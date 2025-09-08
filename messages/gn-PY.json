@@ -1,0 +1,14 @@
+{
+  "common": {
+    "loading": "Oñemyanyhê...",
+    "search": "Heka",
+    "contact": "Ñomongeta",
+    "about": "Mba'épa",
+    "home": "Ñepyrû",
+    "properties": "Mba'e"
+  },
+  "hero": {
+    "title": "Ejuhu nde akeraára",
+    "subtitle": "Iporãvéva umi mba'e ko tendápe"
+  }
+}

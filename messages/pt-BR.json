@@ -1,0 +1,14 @@
+{
+  "common": {
+    "loading": "Carregando...",
+    "search": "Pesquisar",
+    "contact": "Contato",
+    "about": "Sobre",
+    "home": "Início",
+    "properties": "Imóveis"
+  },
+  "hero": {
+    "title": "Encontre o imóvel dos seus sonhos",
+    "subtitle": "A melhor seleção de imóveis da região"
+  }
+}
