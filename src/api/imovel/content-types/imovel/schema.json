@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "imovels",
+  "info": {
+    "singularName": "imovel",
+    "pluralName": "imovels",
+    "displayName": "Imovel"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "titulo": {
+      "type": "string",
+      "required": true
+    },
+    "preco": {
+      "type": "decimal"
+    },
+    "cidade": {
+      "type": "string"
+    },
+    "descricao": {
+      "type": "string"
+    }
+  }
+}
