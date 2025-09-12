@@ -95,7 +95,15 @@ const CRMLeads = ({ apiBase = 'http://localhost:1337/api' }) => {
     setFilteredLeads(filtered);
   };
 
- // useEffect(() => {
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+useEffect(() => {
+  fetchLeads();
+}, []);
+
+// eslint-disable-next-line react-hooks/exhaustive-deps
+useEffect(() => {
+  applyFilters();
+}, [filtroStatus, termoFiltro]);// useEffect(() => {
     fetchLeads();
   }, []);
 
