@@ -103,13 +103,7 @@ useEffect(() => {
 // eslint-disable-next-line react-hooks/exhaustive-deps
 useEffect(() => {
   applyFilters();
-}, [filtroStatus, termoFiltro]);// useEffect(() => {
-    fetchLeads();
-  }, []);
-
- // useEffect(() => {
-    applyFilters();
-  }, [filters, leads]);
+}, [filtroStatus, termoFiltro]);
 
   // Métricas resumidas
   const metrics = {
