@@ -95,15 +95,15 @@ const CRMLeads = ({ apiBase = 'http://localhost:1337/api' }) => {
     setFilteredLeads(filtered);
   };
 
- // eslint-disable-next-line react-hooks/exhaustive-deps
-useEffect(() => {
-  fetchLeads();
-}, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    fetchLeads();
+  }, []);
 
-// eslint-disable-next-line react-hooks/exhaustive-deps
-useEffect(() => {
-  applyFilters();
-}, [filtroStatus, termoFiltro]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    applyFilters();
+  }, [filters, leads]);
 
   // Métricas resumidas
   const metrics = {
