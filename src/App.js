@@ -9,9 +9,9 @@ import {
 } from './localization';
 import PropertySearch from './PropertySearch';
 import PropertyFilters from './PropertyFilters';
-import ImageGallery from './ImageGallery';
+// import ImageGallery from './ImageGallery';
 import CRMLeads from './CRMLeads';
-import PropertyMap from './PropertyMap';
+// eimport PropertyMap from './PropertyMap';
 import { TenantProvider } from './contexts/TenantContext';
 import TenantSelector from './TenantSelector';
 import { useTenant } from './contexts/TenantContext';
