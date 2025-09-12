@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 const CRMLeads = ({ apiBase = 'http://localhost:1337/api' }) => {
   const [leads, setLeads] = useState([]);
@@ -32,7 +32,7 @@ const CRMLeads = ({ apiBase = 'http://localhost:1337/api' }) => {
   ];
 
   // Buscar leads da API
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`${apiBase}/leads?populate=*&sort=createdAt:desc`);
@@ -46,7 +46,7 @@ const CRMLeads = ({ apiBase = 'http://localhost:1337/api' }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [apiBase]);
 
   // Atualizar status do lead
   const updateLeadStatus = async (leadId, newStatus) => {
@@ -71,7 +71,7 @@ const CRMLeads = ({ apiBase = 'http://localhost:1337/api' }) => {
   };
 
   // Aplicar filtros
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = [...leads];
 
     if (filters.status) {
@@ -93,17 +93,15 @@ const CRMLeads = ({ apiBase = 'http://localhost:1337/api' }) => {
     }
 
     setFilteredLeads(filtered);
-  };
+  }, [leads, filters]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchLeads();
-  }, []);
+  }, [fetchLeads]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     applyFilters();
-  }, [filters, leads]);
+  }, [applyFilters]);
 
   // Métricas resumidas
   const metrics = {
