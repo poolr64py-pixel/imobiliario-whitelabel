@@ -95,11 +95,11 @@ const CRMLeads = ({ apiBase = 'http://localhost:1337/api' }) => {
     setFilteredLeads(filtered);
   };
 
-  useEffect(() => {
+ // useEffect(() => {
     fetchLeads();
   }, []);
 
-  useEffect(() => {
+ // useEffect(() => {
     applyFilters();
   }, [filters, leads]);
 
