@@ -67,7 +67,7 @@ const PropertyDetails = ({ imovel, onClose }) => {
         className="fixed inset-0 z-40 bg-black bg-opacity-50 flex items-center justify-center p-0"
         onClick={handleBackdropClick}
       >
-        <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="bg-white rounded-lg max-w-6xl w-full h-[90vh] overflow-y-scroll">
           {/* Header */}
           <div className="flex justify-between items-center p-6 border-b">
             <h2 className="text-2xl font-bold">{imovel.titulo}</h2>
